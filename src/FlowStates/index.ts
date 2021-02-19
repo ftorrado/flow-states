@@ -1,5 +1,7 @@
 import Flow, { FlowFormat } from "./Flow";
-import FlowStates, { FlowStatesFormat } from "./FlowStates";
+import FlowBuilder, { FlowBuildFormat } from "./FlowBuilder";
+import FlowStates from "./FlowStates";
+import FlowValidation from "./FlowValidation";
 import ReferencesMap, {
   ReferenceFormat,
   createReferencesMap
@@ -15,15 +17,21 @@ export default FlowStates;
 
 export {
   Flow,
-  FlowFormat,
-  FlowStates,
-  ReferenceFormat,
-  ReferencesMap,
+  FlowBuilder,
+  FlowValidation,
   createReferencesMap,
-  State,
   StateCategory,
-  StateCategoryVal,
   emptyState,
-  Transition,
   emptyTransition
 };
+
+export type {
+  FlowFormat,
+  FlowBuildFormat,
+  ReferenceFormat,
+  ReferencesMap,
+  State,
+  StateCategoryVal,
+  Transition
+};
+

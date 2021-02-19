@@ -9,48 +9,39 @@ import Container from "react-bootstrap/Container";
 import FlowForm from "./components/FlowForm";
 import FlowContext, { defaultFlow } from "./FlowContext";
 import {
-  FlowFormat,
-  Flow,
   State,
-  emptyState,
   Transition,
-  emptyTransition,
   ReferencesMap,
   createReferencesMap
 } from "./FlowStates";
-import { arraysEqual } from "./utils";
+import FlowBuilder, { FlowBuildFormat } from "./FlowStates/FlowBuilder";
 
 function App() {
-  const [flow, setFlow] = useState<FlowFormat>(defaultFlow);
-  const referencesMapRef = useRef<ReferencesMap>();
-
-  const [stateIdCounter, setStateIdCounter] = useState<number>(
-    flow.states.length
-  );
-  const [transitionIdCounter, setTransitionIdCounter] = useState<number>(
-    flow.transitions.length
-  );
+  const [flow, setFlow] = useState<FlowBuildFormat>(defaultFlow);
+  const referencesMapRef = useRef<ReferencesMap>([]);
 
   useEffect(() => {
-    referencesMapRef.current = createReferencesMap(flow);
+    referencesMapRef.current = createReferencesMap(flow) || [];
   }, [flow]);
 
+  const changeFlow = (newFlow: FlowBuildFormat) => {
+    setFlow({ ...flow, ...newFlow });
+  }
+
   const changeState = (state: State, idx: number) => {
-    const oldValue: State = flow.states[idx];
     const states = flow.states.slice();
     states[idx] = state;
     setFlow({ ...flow, states });
   };
 
   const addState = () => {
-    const _flow = new Flow(flow, stateIdCounter, transitionIdCounter);
+    const _flow = new FlowBuilder(flow);
     _flow.createState();
-    setStateIdCounter(_flow.getTransitionIdCounter());
     setFlow(_flow.getData());
   };
 
-  const removeState = (id: number) => {
-    const _flow = new Flow(flow, stateIdCounter, transitionIdCounter);
+  const removeState = (id: string) => {
+    const _flow = new FlowBuilder(flow);
     _flow.removeState(id);
     setFlow(_flow.getData());
   };
@@ -60,7 +51,7 @@ function App() {
     const transitions = flow.transitions.slice();
 
     if (oldValue.toState !== transition.toState) {
-      const _flow = new Flow(flow, stateIdCounter, transitionIdCounter);
+      const _flow = new FlowBuilder(flow);
       _flow.changeTransitionTarget(transition.id, transition.toState);
       setFlow(_flow.getData());
     } else {
@@ -70,18 +61,17 @@ function App() {
   };
 
   const addTransition = () => {
-    const _flow = new Flow(flow, stateIdCounter, transitionIdCounter);
+    const _flow = new FlowBuilder(flow);
     _flow.createTransition();
-    setTransitionIdCounter(_flow.getTransitionIdCounter());
     setFlow(_flow.getData());
   };
 
-  const removeTransition = (id: number) => {
-    const _flow = new Flow(flow, stateIdCounter, transitionIdCounter);
+  const removeTransition = (id: string) => {
+    const _flow = new FlowBuilder(flow);
     _flow.removeTransition(id);
     setFlow(_flow.getData());
   };
-  
+
   return (
     <div className="App">
       <header className="App-header">
@@ -98,7 +88,7 @@ function App() {
           Learn React
         </a>
       </header>
-	  
+
       <main>
       <h1>FlowStates</h1>
       <p>Cool little editor to create state machine flow charts!</p>

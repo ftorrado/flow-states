@@ -1,19 +1,20 @@
+import State from "./State";
+
 export type TransitionTarget = {
-  id: number;
-  toState: number;
+  id: string;
+  toState: string;
 };
 
 type Transition = {
-  id: number;
-  name: string;
-  toState: number;
-  validate?: (dataStore: Object, sourceState: string) => boolean;
-  onTransition?: (dataStore: Object, sourceState: string) => void;
+  id: string;
+  toState: string;
+  priority?: number;
+  validate?: (dataStore: Object, sourceState: State) => boolean;
+  onTransition?: (dataStore: Object, sourceState: State) => void;
 };
 export default Transition;
 
-export const emptyTransition = (id: number): Transition => ({
+export const emptyTransition = (id: string): Transition => ({
   id,
-  name: "",
-  toState: -1
+  toState: '',
 });

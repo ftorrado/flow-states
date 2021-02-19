@@ -1,48 +1,68 @@
-import FlowInput from "./FlowInput";
+import Flow, { FlowFormat } from "./Flow";
 import State from "./State";
 import Transition from "./Transition";
 
-export type FlowStatesFormat = {
-  name: string;
-  states: Record<string, State>;
-  transitions: Record<string, Transition>;
-  startState: string;
-};
-
+/**
+ * Simple state machine using this custom flow format
+ */
 class FlowStates {
-  public flow: FlowStatesFormat;
+  public flow: Flow;
+  private currentState: State;
 
-  constructor(private input: FlowInput) {
-    this.flow = this.toObject();
+  constructor(public _flow: FlowFormat, public dataStore: Object = {}) {
+    this.flow = new Flow(_flow);
+    this.currentState = this.flow.getStartState();
   }
 
-  toObject(): FlowStatesFormat {
-    const { name, states, transitions, startState } = this.input;
-    if (typeof startState === "undefined") {
-      throw new Error("Flow states needs to be valid");
+  getData(): Object {
+    return this.dataStore;
+  }
+
+  setData(dataStore: Object = {}) {
+    this.dataStore = dataStore;
+  }
+
+  getCurrentState(): State {
+    return this.currentState;
+  }
+
+  getTransitions(): Transition[] {
+    return this.flow.transitions;
+  }
+
+  getNextTransitions(): Transition[] {
+    return this.currentState.targets
+      .map((target) => this.flow.getTransition(target.id))
+      .sort((a, b) => b.priority - a.priority);
+  }
+
+  validateTransition(transition: Transition) {
+    if (transition.validate instanceof Function) {
+      return (transition.validate as Function)(this.dataStore, this.currentState);
     }
-    return {
-      name,
-      states,
-      transitions,
-      startState
-    };
+    return true;
   }
 
-  getFlowName(): string {
-    return this.flow.name;
+  dispatch(action?: string): State {
+    const transitions = this.getNextTransitions();
+    for (let i = 0; i < transitions.length; i++) {
+      if (this.validateTransition(transitions[i])) {
+        this.currentState = this.flow.getState(transitions[i].toState);
+        break;
+      }
+    }
+    return this.currentState;
   }
 
-  getState(stateName: string): State {
-    return this.flow.states[stateName];
-  }
-
-  getStartState(): State {
-    return this.flow.states[this.flow.startState];
-  }
-
-  getTransition(transitionName: string): Transition {
-    return this.flow.transitions[transitionName];
+  stepToState(stateName: string): boolean {
+    const transitions = this.getTransitions();
+    for (let i = 0; i < transitions.length; i++) {
+      if (stateName === transitions[i].toState && this.validateTransition(transitions[i])) {
+        this.currentState = this.flow.getState(transitions[i].toState);
+        return true;
+      }
+    }
+    return false;
   }
 }
 export default FlowStates;

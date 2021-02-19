@@ -1,42 +1,38 @@
 import React from "react";
 
-import { Flow, FlowFormat, ReferencesMap, Transition } from "./FlowStates";
-import State, { StateCategory } from "./FlowStates/State";
+import { FlowBuildFormat, ReferencesMap, Transition, State, StateCategory } from "./FlowStates";
 
-export const defaultFlow: FlowFormat = {
+export const defaultFlow: FlowBuildFormat = {
   name: "New FlowStates",
+  startState: 'Start',
   states: [
     {
-      id: 1,
-      name: "Start",
+      id: "Start",
       category: StateCategory.IDLE,
       targets: [
-        { id:1, toState: 2 }
+        { id: "Get doing it", toState: "Doing" }
       ]
     },
     {
-      id: 2,
-      name: "Doing",
+      id: "Doing",
       category: StateCategory.OPEN,
       targets: [
-        { id: 2, toState: 3 }
+        { id: "Finish it", toState: "Finished" }
       ]
     },
-    { id: 3, name: "Finished", category: StateCategory.CLOSED, targets: [] }
+    { id: "Finished", category: StateCategory.CLOSED, targets: [] }
   ],
   transitions: [
     {
-      id: 1,
-      name: "Get doing it",
-      toState: 2,
+      id: "Get doing it",
+      toState: "Doing",
       onTransition: () => {
         console.log("Transition -- Get doing it");
       }
     },
     {
-      id: 2,
-      name: "Finish it",
-      toState: 3,
+      id: "Finish it",
+      toState: "Finished",
       onTransition: () => {
         console.log("Transition -- Finish it");
       }
@@ -45,26 +41,26 @@ export const defaultFlow: FlowFormat = {
 };
 
 export type FlowContextProps = {
-  flow: Flow,
+  flow: FlowBuildFormat,
   referencesMap: ReferencesMap,
-  changeFlow: (flow: Flow) => void,
+  changeFlow: (flow: FlowBuildFormat) => void,
   changeState: (state: State, idx: number) => void,
   addState: () => void,
-  removeState: (id: number) => void,
+  removeState: (id: string) => void,
   changeTransition: (transition: Transition, idx: number) => void,
   addTransition: () => void,
-  removeTransition: (id: number) => void,
+  removeTransition: (id: string) => void,
 };
 
 const FlowContext = React.createContext<FlowContextProps>({
   flow: defaultFlow,
   referencesMap: [],
-  changeFlow: (flow: Flow) => {},
+  changeFlow: (flow: FlowBuildFormat) => {},
   changeState: (state: State, idx: number) => {},
   addState: () => {},
-  removeState: (id: number) => {},
+  removeState: (id: string) => {},
   changeTransition: (transition: Transition, idx: number) => {},
   addTransition: () => {},
-  removeTransition: (id: number) => {},
+  removeTransition: (id: string) => {},
 });
 export default FlowContext;

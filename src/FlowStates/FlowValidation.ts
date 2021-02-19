@@ -7,20 +7,22 @@ import FlowError, {
   UnreachableStateError,
   UnexpectedError
 } from "./FlowError";
-import { FlowFormat } from "./Flow";
+import Flow, { FlowFormat } from "./Flow";
 import { StateCategory } from "./State";
 import ReferencesMap, { createReferencesMap } from "./ReferencesMap";
 
 class FlowValidation {
   private referencesMap: ReferencesMap;
   private errors: FlowError[];
+  private flowHelper: Flow;
 
-  constructor(private input: FlowFormat) {
-    this.referencesMap = createReferencesMap(input);
+  constructor(private flow: FlowFormat, _referencesMap?: ReferencesMap) {
+    this.referencesMap = _referencesMap || createReferencesMap(flow);
+    this.flowHelper = new Flow(flow);
     this.errors = this.doValidation();
   }
 
-  doValidation(): FlowError[] {
+  private doValidation(): FlowError[] {
     this.errors = [
       ...this.validationStartState(),
       ...this.validationStates(),
@@ -29,7 +31,7 @@ class FlowValidation {
     return this.errors;
   }
 
-  validate(): boolean {
+  isValid(): boolean {
     return this.errors.length === 0;
   }
 
@@ -38,15 +40,16 @@ class FlowValidation {
   }
 
   private validationStartState(): FlowError[] {
-    if (!this.input.startState) {
+    if (!this.flow.startState) {
       return [new NoStartStateError()];
     }
     // check if start state is valid
-    const startState = this.input.states[this.input.startState];
-    if (!startState) {
-      return [new StateMissingError(this.input.startState)];
+    try {
+      this.flowHelper.getStartState();
+      return [];
+    } catch (error) {
+      return [new StateMissingError(this.flow.startState)];
     }
-    return [];
   }
 
   private validationStates(): FlowError[] {
@@ -54,23 +57,24 @@ class FlowValidation {
     // states with no stateTransitions should only be of CLOSED category
     // check for unreachable states
     // check for missing transitions
-    Object.keys(this.input.states).forEach((stateName) => {
-      const state = this.input.states[stateName];
+    this.flow.states.forEach((state) => {
       if (
-        state.transitions.length === 0 &&
+        state.targets.length === 0 &&
         state.category !== StateCategory.CLOSED
       ) {
-        errors.push(new DeadendStateError(stateName));
+        errors.push(new DeadendStateError(state.id));
       }
       if (
-        state.name !== this.input.startState &&
-        !this.referencesMap.find((ref) => ref.toState === state.name)
+        state.id !== this.flow.startState &&
+        !this.referencesMap.find((ref) => ref.toState === state.id)
       ) {
-        errors.push(new UnreachableStateError(stateName));
+        errors.push(new UnreachableStateError(state.id));
       }
-      state.transitions.forEach((target) => {
-        if (!this.input.transitions[target.name]) {
-          errors.push(new TransitionMissingError(target.name, stateName));
+      state.targets.forEach((target) => {
+        try {
+          this.flowHelper.getTransition(target.id);
+        } catch (error) {
+          errors.push(new TransitionMissingError(target.id, state.id));
         }
       });
     });
@@ -81,19 +85,20 @@ class FlowValidation {
     const errors: FlowError[] = [];
     // check for missing source or target states
     // check for cycles
-    Object.keys(this.input.transitions).forEach((transitionName) => {
-      const transition = this.input.transitions[transitionName];
-      if (!this.input.states[transition.toState]) {
+    this.flow.transitions.forEach((transition) => {
+      try {
+        this.flowHelper.getState(transition.toState);
+      } catch (error) {
         errors.push(new StateMissingError(transition.toState));
       }
       const reference = this.referencesMap.find(
-        (ref) => ref.transition === transition.name
+        (ref) => ref.transition === transition.id
       );
       if (!reference) {
         throw new UnexpectedError("Transition missing in references");
       }
       if (reference.fromStates.some((from) => from === transition.toState)) {
-        errors.push(new CyclicalError(transitionName));
+        errors.push(new CyclicalError(transition.id));
       }
     });
     return errors;

@@ -1,3 +1,6 @@
+/**
+ * Base error related to flows
+ */
 class FlowError {
   constructor(
     public code: number,

@@ -1,15 +1,16 @@
 import { FlowFormat } from "./Flow";
+import { FlowBuildFormat } from "./FlowBuilder";
 
 export type ReferenceFormat = {
-  transition: number;
-  toState: number;
-  fromStates: number[];
+  transition: string;
+  toState: string;
+  fromStates: string[];
 };
 
 type ReferencesMap = ReferenceFormat[];
 export default ReferencesMap;
 
-export const createReferencesMap = (flow: FlowFormat): ReferencesMap => {
+export const createReferencesMap = (flow: FlowBuildFormat | FlowFormat): ReferencesMap => {
   const map: ReferencesMap = [];
   flow.states.forEach((state) => {
     state.targets.forEach((target) => {

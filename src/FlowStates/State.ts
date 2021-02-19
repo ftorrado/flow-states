@@ -9,16 +9,14 @@ export const StateCategory = {
 export type StateCategoryVal = typeof StateCategory[keyof typeof StateCategory];
 
 type State = {
-  id: number;
-  name: string;
+  id: string;
   category: StateCategoryVal;
   targets: TransitionTarget[];
 };
 export default State;
 
-export const emptyState = (id: number): State => ({
+export const emptyState = (id: string): State => ({
   id,
-  name: "",
   category: StateCategory.IDLE,
   targets: []
 });
