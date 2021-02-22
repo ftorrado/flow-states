@@ -70,8 +70,8 @@ export class NoStartStateError extends FlowError {
 }
 
 export class InvalidIdError extends FlowError {
-  constructor() {
-    super(0x0007, "InvalidIdError", "ID is invalid or empty");
+  constructor(msg?: string, invalidId?: string) {
+    super(0x0007, "InvalidIdError", `ID is invalid or empty: ${msg} - "${invalidId}"`);
   }
 }
 

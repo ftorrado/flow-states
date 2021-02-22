@@ -33,7 +33,7 @@ class FlowStates {
   getNextTransitions(): Transition[] {
     return this.currentState.targets
       .map((target) => this.flow.getTransition(target.id))
-      .sort((a, b) => b.priority - a.priority);
+      .sort((a, b) => (b.priority || 0) - (a.priority || 0));
   }
 
   validateTransition(transition: Transition) {

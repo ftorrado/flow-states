@@ -42,10 +42,10 @@ export default function FlowForm() {
   return (
     <Form className="FlowForm" noValidate={true}>
       <Form.Group as={Row} controlId="inputFlowName">
-        <Form.Label column sm="3" htmlFor="inputFlowName">
+        <Form.Label column sm="3" xs="4">
           Flow Name
         </Form.Label>
-        <Col sm="9">
+        <Col sm="9" xs="8">
           <Form.Control
             type="text"
             placeholder="Flow Name"
@@ -56,12 +56,12 @@ export default function FlowForm() {
         </Col>
       </Form.Group>
       <Form.Group as={Row} controlId="formStates">
-        <Form.Label column sm="3" htmlFor="flowStates">
+        <Form.Label column sm="3" xs="4">
           States
         </Form.Label>
-        <Col sm="9" id="flowStates">
+        <Col sm="9" xs="8" id="flowStates">
           {flow.states.map((state, idx) => (
-            <StateInput state={state} idx={idx} />
+            <StateInput key={`state${idx}`} state={state} idx={idx} />
           ))}
           <Button variant="secondary" type="button" className="mt-2" onClick={handleCreateState}>
             Create State
@@ -69,12 +69,12 @@ export default function FlowForm() {
         </Col>
       </Form.Group>
       <Form.Group as={Row} controlId="formTransitions">
-        <Form.Label column sm="3" htmlFor="flowTransitions">
+        <Form.Label column sm="3" xs="4">
           Transitions
         </Form.Label>
-        <Col sm="9" id="flowTransitions">
+        <Col sm="9" xs="8" id="flowTransitions">
           {flow.transitions.map((transition, idx) => (
-            <TransitionInput transition={transition} idx={idx} />
+            <TransitionInput key={`transition${idx}`} transition={transition} idx={idx} />
           ))}
           <Button variant="secondary" type="button" className="mt-2" onClick={handleCreateTransition}>
             Create Transition
@@ -82,17 +82,17 @@ export default function FlowForm() {
         </Col>
       </Form.Group>
       <Form.Group as={Row} controlId="inputStartState">
-        <Form.Label column sm="3" htmlFor="inputStartState">
+        <Form.Label column sm="3" xs="4">
           Start State
         </Form.Label>
-        <Col sm="9">
+        <Col sm="9" xs="8">
           {flow.states.length > 0 ? (
-            <Form.Control as="select" defaultValue="null" onChange={handleStartStateChange} required custom>
+            <Form.Control as="select" value={flow.startState} onChange={handleStartStateChange} required custom>
               <option value="null" disabled>
                 Select Starting State
               </option>
               {flow.states.map((state) => (
-                <option value={state.id}>{state.id}</option>
+                <option key={state.id} value={state.id}>{state.id}</option>
               ))}
             </Form.Control>
           ) : (
@@ -113,7 +113,7 @@ export default function FlowForm() {
       </Form.Group>
       <hr />
       <Form.Group as={Row}>
-        <Form.Label column sm="3">
+        <Form.Label column sm="3" xs="4">
           Errors
         </Form.Label>
         <Col className="mt-2">

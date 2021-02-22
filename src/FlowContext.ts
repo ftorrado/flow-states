@@ -1,6 +1,5 @@
 import React from "react";
-
-import { FlowBuildFormat, ReferencesMap, Transition, State, StateCategory } from "./FlowStates";
+import { FlowBuildFormat, ReferencesMap, State, StateCategory, Transition } from "./FlowStates";
 
 export const defaultFlow: FlowBuildFormat = {
   name: "New FlowStates",
@@ -8,19 +7,19 @@ export const defaultFlow: FlowBuildFormat = {
   states: [
     {
       id: "Start",
-      category: StateCategory.IDLE,
+      category: StateCategory.Idle,
       targets: [
         { id: "Get doing it", toState: "Doing" }
       ]
     },
     {
       id: "Doing",
-      category: StateCategory.OPEN,
+      category: StateCategory.Open,
       targets: [
         { id: "Finish it", toState: "Finished" }
       ]
     },
-    { id: "Finished", category: StateCategory.CLOSED, targets: [] }
+    { id: "Finished", category: StateCategory.Closed, targets: [] }
   ],
   transitions: [
     {

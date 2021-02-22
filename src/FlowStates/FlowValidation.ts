@@ -2,6 +2,7 @@ import Flow, { FlowFormat } from "./Flow";
 import FlowError, {
   CyclicalError,
   DeadendStateError,
+  InvalidIdError,
   NoStartStateError,
   StateMissingError,
   TransitionMissingError,
@@ -58,6 +59,9 @@ class FlowValidation {
     // check for unreachable states
     // check for missing transitions
     this.flow.states.forEach((state) => {
+      if (!state.id) {
+        errors.push(new InvalidIdError('State id', state.id));
+      }
       if (
         state.targets.length === 0 &&
         state.category !== StateCategory.Closed
@@ -71,6 +75,10 @@ class FlowValidation {
         errors.push(new UnreachableStateError(state.id));
       }
       state.targets.forEach((target) => {
+        if (!target.id) {
+          errors.push(new InvalidIdError('Target id', target.id));
+          return
+        }
         try {
           this.flowHelper.getTransition(target.id);
         } catch (error) {
@@ -86,6 +94,9 @@ class FlowValidation {
     // check for missing source or target states
     // check for cycles
     this.flow.transitions.forEach((transition) => {
+      if (!transition.id) {
+        errors.push(new InvalidIdError('Transition id', transition.id));
+      }
       try {
         this.flowHelper.getState(transition.toState);
       } catch (error) {

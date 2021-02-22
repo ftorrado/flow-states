@@ -1,28 +1,24 @@
 import "bootstrap/dist/css/bootstrap.min.css";
-import './App.css';
-import "./styles.css";
-import logo from './logo.svg';
-
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import Container from "react-bootstrap/Container";
-
+import './App.css';
 import FlowForm from "./components/FlowForm";
 import FlowContext, { defaultFlow } from "./FlowContext";
 import {
-  State,
-  Transition,
-  ReferencesMap,
-  createReferencesMap
+  createReferencesMap, ReferencesMap, State,
+  Transition
 } from "./FlowStates";
 import FlowBuilder, { FlowBuildFormat } from "./FlowStates/FlowBuilder";
+import "./styles.css";
 
 function App() {
   const [flow, setFlow] = useState<FlowBuildFormat>(defaultFlow);
-  const referencesMapRef = useRef<ReferencesMap>([]);
+  const [referencesMap, setReferencesMap] = useState<ReferencesMap>([]);
 
   useEffect(() => {
-    referencesMapRef.current = createReferencesMap(flow) || [];
-  }, [flow]);
+    setReferencesMap(createReferencesMap(flow) || []);
+    console.log('Updating references map');
+  }, [flow, flow.states, flow.transitions]);
 
   const changeFlow = (newFlow: FlowBuildFormat) => {
     setFlow({ ...flow, ...newFlow });
@@ -30,8 +26,35 @@ function App() {
 
   const changeState = (state: State, idx: number) => {
     const states = flow.states.slice();
+    const oldId = states[idx].id;
     states[idx] = state;
-    setFlow({ ...flow, states });
+    if (oldId === state.id) {
+      setFlow({ ...flow, states });
+    } else {
+      const newId = state.id;
+      console.log('Changing state id', oldId, newId);
+      setFlow({
+        ...flow,
+        startState: flow.startState === oldId ? newId : flow.startState,
+        states: states.map((state) => (
+          {
+            ...state,
+            targets: state.targets.map((target) => {
+              if (target.toState === oldId) {
+                return { ...target, toState: newId };
+              }
+              return target;
+            })
+          }
+        )),
+        transitions: flow.transitions.map((transition) => (
+          {
+            ...transition,
+            toState: transition.toState === oldId ? newId : transition.toState
+          }
+        ))
+      });
+    }
   };
 
   const addState = () => {
@@ -74,28 +97,16 @@ function App() {
 
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
+      <header className="App-header pt-3">
+        <h1>FlowStates</h1>
+        <p>Cool little editor to create workflows as a simple state machine!</p>
       </header>
 
-      <main>
-      <h1>FlowStates</h1>
-      <p>Cool little editor to create state machine flow charts!</p>
+      <main className="pt-3">
         <Container>
           <FlowContext.Provider value={{
             flow,
-            referencesMap: referencesMapRef.current,
+            referencesMap,
             changeFlow,
             changeState,
             addState,
