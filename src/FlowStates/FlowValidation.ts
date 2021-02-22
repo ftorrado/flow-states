@@ -1,15 +1,15 @@
+import Flow, { FlowFormat } from "./Flow";
 import FlowError, {
   CyclicalError,
   DeadendStateError,
   NoStartStateError,
   StateMissingError,
   TransitionMissingError,
-  UnreachableStateError,
-  UnexpectedError
+
+  UnexpectedError, UnreachableStateError
 } from "./FlowError";
-import Flow, { FlowFormat } from "./Flow";
-import { StateCategory } from "./State";
 import ReferencesMap, { createReferencesMap } from "./ReferencesMap";
+import { StateCategory } from "./State";
 
 class FlowValidation {
   private referencesMap: ReferencesMap;
@@ -54,13 +54,13 @@ class FlowValidation {
 
   private validationStates(): FlowError[] {
     const errors: FlowError[] = [];
-    // states with no stateTransitions should only be of CLOSED category
+    // states with no stateTransitions should only be of Closed category
     // check for unreachable states
     // check for missing transitions
     this.flow.states.forEach((state) => {
       if (
         state.targets.length === 0 &&
-        state.category !== StateCategory.CLOSED
+        state.category !== StateCategory.Closed
       ) {
         errors.push(new DeadendStateError(state.id));
       }

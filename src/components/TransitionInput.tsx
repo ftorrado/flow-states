@@ -1,75 +1,67 @@
-import React, { useEffect, useRef } from "react";
+import React, { useContext, useEffect, useRef } from "react";
+import Button from "react-bootstrap/Button";
+import Card from "react-bootstrap/Card";
+import Col from "react-bootstrap/Col";
 import Form from "react-bootstrap/Form";
 import Row from "react-bootstrap/Row";
-import Col from "react-bootstrap/Col";
-import Card from "react-bootstrap/Card";
-import Button from "react-bootstrap/Button";
-
+import FlowContext from "../FlowContext";
 import {
-  FlowInputFormat,
   ReferenceFormat,
-  ReferencesMapFormat,
-  TransitionFormat
+  Transition
 } from "../FlowStates";
 
+
 type TransitionInputProps = {
-  transition: TransitionFormat;
+  transition: Transition;
   idx: number;
-  referencesMap: ReferencesMapFormat;
-  flowInput: FlowInputFormat;
-  setFlowInput: React.Dispatch<React.SetStateAction<FlowInputFormat>>;
 };
 
 export default function TransitionInput({
   transition,
-  idx,
-  referencesMap,
-  flowInput,
-  setFlowInput
+  idx
 }: TransitionInputProps) {
-  let reference = useRef<ReferenceFormat | undefined>();
+  const { flow, referencesMap, changeTransition, removeTransition } = useContext(FlowContext);
+  const referenceRef = useRef<ReferenceFormat>();
 
   useEffect(() => {
-    reference.current = referencesMap.find(
-      (ref) => ref.transition === transition.name
+    referenceRef.current = referencesMap.find(
+      (ref) => ref.transition === transition.id
     );
-  }, [transition.name, referencesMap]);
+  }, [transition.id, referencesMap]);
 
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = event.target;
-    switch (name) {
-      case "name":
-        // update related states too
-        setFlowInput((prevState) => ({
-          ...prevState,
-          name: value
-        }));
-        break;
-      default:
-        console.warn(`Unknown input change on TransitionInput: ${name}`);
-    }
+  const handleRemove = (event: React.MouseEvent<HTMLElement, MouseEvent>) => {
+    event.preventDefault();
+    removeTransition(transition.id);
+  };
+
+  const handleIdChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    changeTransition({...transition, id: event.target.value}, idx);
+  };
+
+  const handleTargetChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    changeTransition({...transition, toState: event.target.value}, idx);
   };
 
   return (
     <Card body>
       <Form.Group as={Row}>
         <Col className="text-right pb-0">
-          <Button variant="warning" size="sm" type="button">
+          <Button variant="warning" size="sm" type="button" onClick={handleRemove}>
             x
           </Button>
         </Col>
       </Form.Group>
-      <Form.Group as={Row} controlId={`inputTransitionName-${idx}`}>
+      <Form.Group as={Row} controlId={`inputTransitionId-${idx}`}>
         <Form.Label column sm="4">
-          Name
+          Id
         </Form.Label>
         <Col sm="8">
           <Form.Control
             type="text"
-            placeholder="Name"
-            value={transition.name}
-            name="name"
-            onChange={handleChange}
+            placeholder="Id"
+            value={transition.id}
+            name="id"
+            onChange={handleIdChange}
           />
         </Col>
       </Form.Group>
@@ -79,7 +71,7 @@ export default function TransitionInput({
         </Form.Label>
         <Col sm="8" className="text-left">
           <ul>
-            {(reference?.fromStates || []).map((source) => (
+            {(referenceRef.current?.fromStates || []).map((source) => (
               <li>{source}</li>
             ))}
           </ul>
@@ -90,9 +82,9 @@ export default function TransitionInput({
           Target
         </Form.Label>
         <Col sm="8">
-          <Form.Control as="select" value={transition.toState} custom>
-            {flowInput.states.map((state) => (
-              <option value={state.name}>{state.name}</option>
+          <Form.Control as="select" value={transition.toState} onChange={handleTargetChange} custom>
+            {flow.states.map((state) => (
+              <option value={state.id}>{state.id}</option>
             ))}
           </Form.Control>
         </Col>

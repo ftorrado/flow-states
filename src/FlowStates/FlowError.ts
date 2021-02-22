@@ -69,6 +69,12 @@ export class NoStartStateError extends FlowError {
   }
 }
 
+export class InvalidIdError extends FlowError {
+  constructor() {
+    super(0x0007, "InvalidIdError", "ID is invalid or empty");
+  }
+}
+
 export class OverwriteStateWarning extends FlowError {
   constructor(stateName: string) {
     super(0x0101, "OverwriteStateWarning", `Overwriting state ${stateName}`);

@@ -3,15 +3,13 @@ import FlowBuilder, { FlowBuildFormat } from "./FlowBuilder";
 import FlowStates from "./FlowStates";
 import FlowValidation from "./FlowValidation";
 import ReferencesMap, {
-  ReferenceFormat,
-  createReferencesMap
+  createReferencesMap, ReferenceFormat
 } from "./ReferencesMap";
 import State, {
-  StateCategory,
-  StateCategoryVal,
-  emptyState
+  emptyState, StateCategory,
+  StateCategoryVal
 } from "./State";
-import Transition, { emptyTransition } from "./Transition";
+import Transition, { emptyTransition, TransitionTarget } from "./Transition";
 
 export default FlowStates;
 
@@ -24,7 +22,6 @@ export {
   emptyState,
   emptyTransition
 };
-
 export type {
   FlowFormat,
   FlowBuildFormat,
@@ -32,6 +29,8 @@ export type {
   ReferencesMap,
   State,
   StateCategoryVal,
-  Transition
+  Transition,
+  TransitionTarget
 };
+
 
