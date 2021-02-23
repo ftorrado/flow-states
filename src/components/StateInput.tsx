@@ -124,12 +124,13 @@ export default function StateInput({ state, idx }: StateInputProps) {
                   <Col>
                     <Form.Control as="select" value={target.id} onChange={handleTargetIdChange(target.id)} custom>
                       <option value="null" disabled>Select Transition Target</option>
-                      <option value={target.id}>{target.id}</option>
+                      <option value={target.id}>{target.id} (=&gt; {target.toState})</option>
                       {availableTargets.list.map((otherTarget) => (
-                        <option key={otherTarget.id} value={otherTarget.id}>{otherTarget.id}</option>
+                        <option key={otherTarget.id} value={otherTarget.id}>
+                          {otherTarget.id} (=&gt; {otherTarget.toState})
+                        </option>
                       ))}
                     </Form.Control>
-                    <span>==&gt; {target.toState}</span>
                   </Col>
                   <Col xs="auto" className="pl-0 m-auto">
                     <Button variant="warning" size="sm" type="button" onClick={handleRemoveTarget(target.id)}>
@@ -156,6 +157,17 @@ export default function StateInput({ state, idx }: StateInputProps) {
             x
           </Button>
         </Form.Group>
+        {/* TODO
+        <Form.Group as={Row}>
+          <Button variant="secondary" size="sm" type="button">
+            <pre>-&gt;</pre> f()
+          </Button>
+        </Form.Group>
+        <Form.Group as={Row}>
+          <Button variant="secondary" size="sm" type="button">
+            f() <pre>-&gt;</pre>
+          </Button>
+        </Form.Group>*/}
       </Col>
       </Row>
     </Card>
