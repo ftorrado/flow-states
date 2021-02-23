@@ -4,7 +4,7 @@ Cool little editor to create workflows as a simple state machine!
 
 Written using React with hooks and TypeScript. Will extend to do a few more things soon.
 
-![Demo of the reactive form]()
+![Demo of the reactive form](https://github.com/ftorrado/flow-states/blob/main/public/flow-form-demo.gif?raw=true)
 
 ## Using the project
 
