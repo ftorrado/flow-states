@@ -3,20 +3,28 @@ import Button from "react-bootstrap/Button";
 import Card from "react-bootstrap/Card";
 import Col from "react-bootstrap/Col";
 import Form from "react-bootstrap/Form";
+import Modal from "react-bootstrap/Modal";
+import OverlayTrigger from "react-bootstrap/OverlayTrigger";
 import Row from "react-bootstrap/Row";
+import Tooltip from "react-bootstrap/Tooltip";
 import FlowContext from "../FlowContext";
-import { State, StateCategory, StateCategoryVal, TransitionTarget } from "../FlowStates";
+import { State, TransitionTarget } from "../FlowStates";
+import StateDetailsForm from "./StateDetailsForm";
 
 type AvailableTargets = {list: TransitionTarget[], hasAny: boolean};
 
-type StateInputProps = {
+export type StateFormProps = {
   state: State;
   idx: number;
 };
 
-export default function StateInput({ state, idx }: StateInputProps) {
+export default function StateForm({ state, idx }: StateFormProps) {
   const { flow, changeState, removeState } = useContext(FlowContext);
   const [availableTargets, setAvailableTargets] = useState<AvailableTargets>({ list: [], hasAny: false });
+  const [ showDetails, setShowDetails ] = useState<boolean>(false);
+
+  const handleCloseDetails = () => setShowDetails(false);
+  const handleShowDetails = () => setShowDetails(true);
 
   useEffect(() => {
     console.log(`Setting available targets for state ${state.id}`);
@@ -41,11 +49,6 @@ export default function StateInput({ state, idx }: StateInputProps) {
 
   const handleIdChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     changeState({...state, id: event.target.value}, idx);
-  };
-
-  const handleCategoryChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const category = StateCategory[(event.target.value as StateCategoryVal)] || StateCategory.Idle;
-    changeState({...state, category }, idx);
   };
 
   const handleTargetIdChange = (targetId: string) => (
@@ -99,21 +102,7 @@ export default function StateInput({ state, idx }: StateInputProps) {
             <Form.Control type="text" placeholder="Id" value={state.id} onChange={handleIdChange} />
           </Col>
         </Form.Group>
-        <Form.Group as={Row} controlId={`inputStateCategory-${idx}`}>
-          <Form.Label column sm="4">
-            Category
-          </Form.Label>
-          <Col sm="8">
-            <Form.Control as="select" value={state.category} onChange={handleCategoryChange} custom>
-              {(Object.keys(StateCategory)
-                .filter((key: any) => typeof StateCategory[key] === 'number') as StateCategoryVal[])
-                .map((category) => (
-                  <option key={category} value={StateCategory[category]}>{category}</option>
-                ))}
-            </Form.Control>
-          </Col>
-        </Form.Group>
-        <Form.Group as={Row} className="mb-0" controlId={`inputStateTransitions-${idx}`}>
+        <Form.Group as={Row} className="mb-0" id={`inputStateTransitions-${idx}`}>
           <Form.Label column sm="4">
             Transitions
           </Form.Label>
@@ -157,19 +146,27 @@ export default function StateInput({ state, idx }: StateInputProps) {
             x
           </Button>
         </Form.Group>
-        {/* TODO
-        <Form.Group as={Row}>
-          <Button variant="secondary" size="sm" type="button">
-            <pre>-&gt;</pre> f()
-          </Button>
+        <Form.Group as={Row} className="pt-1">
+          <OverlayTrigger placement="bottom"
+            delay={{ show: 0, hide: 400 }}
+            overlay={<Tooltip id={`state-tooltip-${idx}`}>State details</Tooltip>}
+          >
+            <Button variant="secondary" size="sm" type="button" onClick={handleShowDetails}>
+              &#8230;
+            </Button>
+          </OverlayTrigger>
         </Form.Group>
-        <Form.Group as={Row}>
-          <Button variant="secondary" size="sm" type="button">
-            f() <pre>-&gt;</pre>
-          </Button>
-        </Form.Group>*/}
       </Col>
       </Row>
+
+      <Modal show={showDetails} onHide={handleCloseDetails}>
+        <Modal.Header closeButton>
+          <Modal.Title>State details - {state.id}</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <StateDetailsForm state={state} idx={idx} />
+        </Modal.Body>
+      </Modal>
     </Card>
   );
 }

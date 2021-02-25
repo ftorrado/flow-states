@@ -18,7 +18,7 @@ function App() {
   useEffect(() => {
     setReferencesMap(createReferencesMap(flow) || []);
     console.log('Updating references map');
-  }, [flow, flow.states, flow.transitions]);
+  }, [flow.states, flow.transitions]);
 
   const changeFlow = (newFlow: FlowBuildFormat) => {
     setFlow({ ...flow, ...newFlow });
@@ -28,33 +28,34 @@ function App() {
     const states = flow.states.slice();
     const oldId = states[idx].id;
     states[idx] = state;
+    console.log(state);
     if (oldId === state.id) {
       setFlow({ ...flow, states });
-    } else {
-      const newId = state.id;
-      console.log('Changing state id', oldId, newId);
-      setFlow({
-        ...flow,
-        startState: flow.startState === oldId ? newId : flow.startState,
-        states: states.map((state) => (
-          {
-            ...state,
-            targets: state.targets.map((target) => {
-              if (target.toState === oldId) {
-                return { ...target, toState: newId };
-              }
-              return target;
-            })
-          }
-        )),
-        transitions: flow.transitions.map((transition) => (
-          {
-            ...transition,
-            toState: transition.toState === oldId ? newId : transition.toState
-          }
-        ))
-      });
+      return;
     }
+    const newId = state.id;
+    console.log('Changing state id', oldId, newId);
+    setFlow({
+      ...flow,
+      startState: flow.startState === oldId ? newId : flow.startState,
+      states: states.map((state) => (
+        {
+          ...state,
+          targets: state.targets.map((target) => {
+            if (target.toState === oldId) {
+              return { ...target, toState: newId };
+            }
+            return target;
+          })
+        }
+      )),
+      transitions: flow.transitions.map((transition) => (
+        {
+          ...transition,
+          toState: transition.toState === oldId ? newId : transition.toState
+        }
+      ))
+    });
   };
 
   const addState = () => {
@@ -72,15 +73,15 @@ function App() {
   const changeTransition = (transition: Transition, idx: number) => {
     const oldValue: Transition = flow.transitions[idx];
     const transitions = flow.transitions.slice();
+    let flowData = flow;
 
-    if (oldValue.toState !== transition.toState) {
+    if (oldValue.toState !== transition.toState || oldValue.id !== transition.id) {
       const _flow = new FlowBuilder(flow);
       _flow.changeTransitionTarget(transition.id, transition.toState);
-      setFlow(_flow.getData());
-    } else {
-      transitions[idx] = transition;
-      setFlow({ ...flow, transitions });
+      flowData = _flow.getData();
     }
+    transitions[idx] = transition;
+    setFlow({ ...flowData, transitions });
   };
 
   const addTransition = () => {

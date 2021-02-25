@@ -4,8 +4,8 @@ import Col from "react-bootstrap/Col";
 import Form from "react-bootstrap/Form";
 import Row from "react-bootstrap/Row";
 import FlowContext from "../FlowContext";
-import StateInput from "./StateInput";
-import TransitionInput from "./TransitionInput";
+import StateForm from "./StateForm";
+import TransitionForm from "./TransitionForm";
 
 
 export default function FlowForm() {
@@ -42,10 +42,10 @@ export default function FlowForm() {
   return (
     <Form className="FlowForm" noValidate={true}>
       <Form.Group as={Row} controlId="inputFlowName">
-        <Form.Label column sm="3" xs="4">
+        <Form.Label column xs="3">
           Flow Name
         </Form.Label>
-        <Col sm="9" xs="8">
+        <Col xs="9">
           <Form.Control
             type="text"
             placeholder="Flow Name"
@@ -56,12 +56,12 @@ export default function FlowForm() {
         </Col>
       </Form.Group>
       <Form.Group as={Row} controlId="formStates">
-        <Form.Label column sm="3" xs="4">
+        <Form.Label column xs="3">
           States
         </Form.Label>
-        <Col sm="9" xs="8" id="flowStates">
+        <Col xs="9" id="flowStates">
           {flow.states.map((state, idx) => (
-            <StateInput key={`state${idx}`} state={state} idx={idx} />
+            <StateForm key={`state${idx}`} state={state} idx={idx} />
           ))}
           <Button variant="secondary" type="button" className="mt-2" onClick={handleCreateState}>
             Create State
@@ -69,12 +69,12 @@ export default function FlowForm() {
         </Col>
       </Form.Group>
       <Form.Group as={Row} controlId="formTransitions">
-        <Form.Label column sm="3" xs="4">
+        <Form.Label column xs="3">
           Transitions
         </Form.Label>
-        <Col sm="9" xs="8" id="flowTransitions">
+        <Col xs="9" id="flowTransitions">
           {flow.transitions.map((transition, idx) => (
-            <TransitionInput key={`transition${idx}`} transition={transition} idx={idx} />
+            <TransitionForm key={`transition${idx}`} transition={transition} idx={idx} />
           ))}
           <Button variant="secondary" type="button" className="mt-2" onClick={handleCreateTransition}>
             Create Transition
@@ -82,10 +82,10 @@ export default function FlowForm() {
         </Col>
       </Form.Group>
       <Form.Group as={Row} controlId="inputStartState">
-        <Form.Label column sm="3" xs="4">
+        <Form.Label column xs="3">
           Start State
         </Form.Label>
-        <Col sm="9" xs="8">
+        <Col xs="9">
           {flow.states.length > 0 ? (
             <Form.Control as="select" value={flow.startState} onChange={handleStartStateChange} required custom>
               <option value="null" disabled>
@@ -100,26 +100,13 @@ export default function FlowForm() {
           )}
         </Col>
       </Form.Group>
+
+      <hr/>
       <Form.Group as={Row} controlId="inputSubmit">
         <Col>
-          <Button variant="secondary" type="button" className="mt-2" onClick={doValidation}>
-            Check errors
-          </Button>
-          &nbsp;&nbsp;&nbsp;
           <Button variant="primary" type="button" className="mt-2" onClick={handleSubmit}>
             Finish
           </Button>
-        </Col>
-      </Form.Group>
-      <hr />
-      <Form.Group as={Row}>
-        <Form.Label column sm="3" xs="4">
-          Errors
-        </Form.Label>
-        <Col className="mt-2">
-          <ul>
-            <li>TODO</li>
-          </ul>
         </Col>
       </Form.Group>
     </Form>
