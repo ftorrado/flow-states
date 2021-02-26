@@ -97,26 +97,27 @@ export default function TransitionForm({
           }
         </Col>
 
-        <Col xs="1" className="p-0 pl-3">
-          <Form.Group as={Row} >
-            <Button variant="warning" size="sm" type="button" onClick={handleRemove}>
+        <Col xs="1">
+          <OverlayTrigger placement="top"
+            delay={{ show: 0, hide: 200 }}
+            overlay={<Tooltip id={`transition-tooltip-x-${idx}`}>Remove</Tooltip>}
+          >
+            <Button className="mb-2" variant="warning" size="sm" type="button" onClick={handleRemove}>
               x
             </Button>
-          </Form.Group>
-          <Form.Group as={Row} className="pt-1">
-            <OverlayTrigger placement="bottom"
-              delay={{ show: 0, hide: 400 }}
-              overlay={<Tooltip id={`transition-tooltip-${idx}`}>Transition details</Tooltip>}
-            >
-              <Button variant="secondary" size="sm" type="button" onClick={handleShowDetails}>
-                &#8230;
-              </Button>
-            </OverlayTrigger>
-          </Form.Group>
+          </OverlayTrigger>
+          <OverlayTrigger placement="bottom"
+            delay={{ show: 0, hide: 200 }}
+            overlay={<Tooltip id={`transition-tooltip-${idx}`}>Transition details</Tooltip>}
+          >
+            <Button className="mb-2" variant="secondary" size="sm" type="button" onClick={handleShowDetails}>
+              &#8230;
+            </Button>
+          </OverlayTrigger>
         </Col>
       </Row>
 
-      <Modal show={showDetails} onHide={handleCloseDetails}>
+      <Modal show={showDetails} onHide={handleCloseDetails} size="lg">
         <Modal.Header closeButton>
           <Modal.Title>Transition details - {transition.id}</Modal.Title>
         </Modal.Header>

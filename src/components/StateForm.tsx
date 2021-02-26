@@ -140,22 +140,24 @@ export default function StateForm({ state, idx }: StateFormProps) {
           </Col>
         </Form.Group>
       </Col>
-      <Col xs="1" className="p-0 pl-3">
-        <Form.Group as={Row}>
-          <Button variant="warning" size="sm" type="button" onClick={handleRemove}>
+
+      <Col xs="1">
+        <OverlayTrigger placement="top"
+          delay={{ show: 0, hide: 200 }}
+          overlay={<Tooltip id={`state-tooltip-x-${idx}`}>Remove</Tooltip>}
+        >
+          <Button className="mb-2" variant="warning" size="sm" type="button" onClick={handleRemove}>
             x
           </Button>
-        </Form.Group>
-        <Form.Group as={Row} className="pt-1">
-          <OverlayTrigger placement="bottom"
-            delay={{ show: 0, hide: 400 }}
-            overlay={<Tooltip id={`state-tooltip-${idx}`}>State details</Tooltip>}
-          >
-            <Button variant="secondary" size="sm" type="button" onClick={handleShowDetails}>
-              &#8230;
-            </Button>
-          </OverlayTrigger>
-        </Form.Group>
+        </OverlayTrigger>
+        <OverlayTrigger placement="bottom"
+          delay={{ show: 0, hide: 200 }}
+          overlay={<Tooltip id={`state-tooltip-${idx}`}>State details</Tooltip>}
+        >
+          <Button className="mb-2" variant="secondary" size="sm" type="button" onClick={handleShowDetails}>
+            &#8230;
+          </Button>
+        </OverlayTrigger>
       </Col>
       </Row>
 

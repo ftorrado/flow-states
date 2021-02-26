@@ -1,4 +1,3 @@
-import State from "./State";
 
 export type TransitionTarget = {
   id: string;
@@ -9,8 +8,8 @@ type Transition = {
   id: string;
   toState: string;
   priority?: number;
-  validate?: (dataStore: Object, sourceState: State) => boolean;
-  onTransition?: (dataStore: Object, sourceState: State) => void;
+  validate?: (dataStore: Object, sourceState: string) => boolean;
+  onTransition?: (dataStore: Object, sourceState: string) => void;
 };
 export default Transition;
 
